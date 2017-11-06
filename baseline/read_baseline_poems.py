@@ -1,10 +1,12 @@
+
+# This file reads in all of Emily Dickinson's poems and puts them into one large corpus. 
+
+
 import os
 import random
 import collections
 import string
-import wordSegUtil
 POEMS_DIR = 'dickinson_parsing/poems'
-CORPUS = 'all_poems.txt'
 NUM_POEMS = 5
 LINE_COUNT = 7
 SHORT_LINE_WORDS = 4
@@ -34,7 +36,7 @@ def read_poem(file,words,printable, write_to_all):
 # Reads in all the poems and stores all of the words in the 
 # words list. Then returns the words list for use in 
 # poem generation. 
-def read_poems(printable, write_to_all = False):
+def read_poems(printable, write_to_all = True):
 	if write_to_all:
 		with open('all_poems.txt','w') as txtfile:
 			txtfile.write('All of Emily Dickinsons poems. Used as a corpus')
