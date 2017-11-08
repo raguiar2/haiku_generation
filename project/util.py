@@ -134,3 +134,22 @@ class GridSearchProblem(SearchProblem):
         if y-1 >= 0: results.append(('West', (x, y-1), 2))
         if y+1 < self.size: results.append(('East', (x, y+1), 1))
         return results
+
+
+# class to clear and write poems to a file.
+class PoemGenerator():
+    def __init__(self,filename="baseline.txt"):
+        self.filename = filename
+    # writes a poem to the baseline.txt file
+    def write_poem(self,poem):
+        # the 'a' flag says to append, rather than to overwrite the file
+        with open(self.filename,'a') as txtfile:
+            txtfile.write(poem)
+            txtfile.write('\n\n')
+
+    # clears the entire baseline file so new poems can be written
+    def clear_baseline_file(self):
+        with open(self.filename,'w') as txtfile:
+            txtfile.write('Poems are seven lines each, delimited by the line breaks')
+            txtfile.write('\n\n')
+

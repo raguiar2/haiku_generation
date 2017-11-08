@@ -5,11 +5,12 @@ import sys
 import random
 import nltk
 NUM_POEMS = 1
-from .. import baseline
+import sys
+from util import PoemGenerator
 
 
-def generate_poem():
-	pass
+def generate_poem(firstline):
+	return firstline
 
 
 # only one argument for now. If the user specifies the -l flag
@@ -33,8 +34,11 @@ def get_args():
 
 def main():
 	firstline = get_args()
+	poemgenerator = PoemGenerator("poems.txt")
+	poemgenerator.clear_baseline_file()
 	for _ in range(NUM_POEMS):
-		generate_poem()
+		poem = generate_poem(firstline)
+		poemgenerator.write_poem(poem)
 
 if __name__=='__main__':
 	main()
