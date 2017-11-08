@@ -3,7 +3,9 @@
 # write them to poems.txt
 import sys
 import random
+import nltk
 NUM_POEMS = 1
+from .. import baseline
 
 
 def generate_poem():
@@ -20,7 +22,6 @@ def get_args():
 		with open('first_lines.txt') as lines:
 			firstlines = lines.readlines()
 			return random.choice(firstlines)
- 
 	elif len(sys.argv) == 2:
 		firstline = sys.argv[1]
 		return firstline
@@ -32,7 +33,7 @@ def get_args():
 
 def main():
 	firstline = get_args()
-	for _ in NUM_POEMS:
+	for _ in range(NUM_POEMS):
 		generate_poem()
 
 if __name__=='__main__':
