@@ -13,15 +13,15 @@ NUM_POEMS = 3
 
 
 # writes a poem to the baseline.txt file
-def write_poem(poem):
+def write_poem(poem, filename="baseline.txt"):
 	# the 'a' flag says to append, rather than to overwrite the file
-	with open('baseline.txt','a') as txtfile:
+	with open(filename,'a') as txtfile:
 		txtfile.write(poem)
 		txtfile.write('\n\n')
 
 # clears the entire baseline file so new poems can be written
-def clear_baseline_file():
-	with open('baseline.txt','w') as txtfile:
+def clear_baseline_file(baseline_file = "baseline.txt"):
+	with open(baseline_file,'w') as txtfile:
 		txtfile.write('Poems are seven lines each, delimited by the line breaks')
 		txtfile.write('\n\n')
 
@@ -31,14 +31,12 @@ def get_min_word(bigramCost,words,prev):
 	for word in words:
 		cost = bigramCost(prev,word)
 		if cost < mincost:
-			prob = random.randint(1,4)
-			if prob == 1:
-				minword = word
-				mincost = cost
+			minword = word
+			mincost = cost
 			#minword = word
 		# with some probability choose a different word. 
 		elif cost == mincost:
-			prob = random.randint(1,4)
+			prob = random.randint(1,2)
 			if prob == 1:
 				minword = word
 	words.remove(minword)
