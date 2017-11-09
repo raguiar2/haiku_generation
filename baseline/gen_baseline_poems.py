@@ -12,6 +12,7 @@ NUM_POEMS = 3
 
 
 
+
 # writes a poem to the baseline.txt file
 def write_poem(poem, filename="baseline.txt"):
 	# the 'a' flag says to append, rather than to overwrite the file
