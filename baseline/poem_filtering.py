@@ -9,6 +9,7 @@ POEMS_DIR = 'other_poets'
 
 def read_poem(file):
     lines = file.readlines()
+    contentsFound = False
     with open('all_other_poems.txt','a') as txtfile:
         for line in lines:
             fixedtext = ""
@@ -21,7 +22,12 @@ def read_poem(file):
             # strip EOL. 
             fixedtext = fixedtext.strip()
             # write to txt file
-            txtfile.write(fixedtext.lower() + '\n')
+            # only obtain text after contents tag
+            if fixedtext == "CONTENTS.":
+                print 'CONTENTS. Found'
+                contentsFound = True
+            if contentsFound == True:
+                txtfile.write(fixedtext.lower() + '\n')
 
 def read_poems():
     with open('all_other_poems.txt', 'w') as txtfile:
