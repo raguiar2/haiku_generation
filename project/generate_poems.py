@@ -9,8 +9,13 @@ import sys
 from util import PoemGenerator
 
 
-def generate_poem(firstline):
-	return firstline
+def generatePoem(firstline):
+    if len(firstline) == 0:
+        return ''
+    ucs = util.UniformCostSearch(verbose=0)
+    ucs.solve(GeneratePoemProblem(firstline))
+    return ' '.join(ucs.actions)
+
 
 
 # only one argument for now. If the user specifies the -l flag
