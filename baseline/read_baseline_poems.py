@@ -5,7 +5,7 @@ import os
 import random
 import collections
 import string
-POEMS_DIR = 'dickinson_parsing/poems'
+POEMS_DIR = 'poet_parsing/poems'
 LINE_COUNT = 7
 SHORT_LINE_WORDS = 4
 LONG_LINE_INCREASE = 2

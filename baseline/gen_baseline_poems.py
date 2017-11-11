@@ -7,7 +7,7 @@ import collections
 import string
 import wordsegUtil
 from read_baseline_poems import * 
-CORPUS = 'all_poems.txt'
+CORPUS = 'poet_parsing/poems/all_other_poems.txt'
 NUM_POEMS = 3
 
 
