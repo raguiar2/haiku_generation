@@ -4,45 +4,42 @@ import random
 
 class GeneratePoemProblem(util.SearchProblem):
     def __init__(self,firstline,words,unigramCost,bigramCost):
-    	self.prevline = firstline
-        self.line = ""
-        self.linenum = 2
+        self.prevword = firstline[-1]
+        self.linewords = 0
+        self.numiter = 0
         # fix this to something more complicated? 
-        self.maxlines = 3 #random.randint(8,12)
         self.words = words
         self.unigramCost = unigramCost
         self.bigramCost = bigramCost
         self.wordsperline = 5
     def startState(self):
-    	return (tuple(self.prevline),"",2)
+    	return (self.prevword, "",self.linewords)
     def isEnd(self, state):
-        prevline, currline, linenum = state
-    	return linenum == self.maxlines
+        prevword, currline, linewords = state
+    	return linewords == self.wordsperline
     # Todo: Fix cost function
     def succAndCost(self, state):
-    	prevline, currline, linenum = state
-        prevline = list(prevline)
+    	prevword, currline, linewords = state
         currline = list(currline)
         successors = []
         if len(currline)>=self.wordsperline:
-            endlineaction = ("",(tuple(currline),"",linenum+1),0) #todo: change cost 
+            endlineaction = ("\n",(prevword,"",linewords+1),0) #todo: change cost 
             successors.append(endlineaction)
             return successors
         wordcosts = {}
-        for word in self.words:
-            if len(currline) == 0:
-                wordcosts[word] = self.unigramCost(word)
-            else:
-                wordcosts[word] = self.bigramCost(currline[-1],word)
+        for word in random.sample(self.words,50):
+            wordcosts[word] = self.bigramCost(prevword,word)
         worditems = wordcosts.items()
         worditems.sort(key = lambda x: x[1])
         lowestcostwords = []
-        for i in range(5):
+        for i in range(25):
             lowestcostwords.append(worditems[i][0])
         for word in lowestcostwords:
             action = word
-            newstate = (tuple(prevline),tuple(currline+[word]),linenum)
+            newstate = (prevword,tuple(currline+[word]),linewords+1)
             cost = wordcosts[word]
             successors.append((action,newstate,cost))
+        self.numiter += 1
+
         return successors
 
