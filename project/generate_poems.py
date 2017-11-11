@@ -59,8 +59,13 @@ def generate_poem(firstline):
     print('training cost functions....')
     unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
     print('cost functions trained!')
-    ucs.solve(GeneratePoemProblem(firstline,words, unigramCost,bigramCost)) #todo: learn cost function and add it as second param. 
-    return ' '.join(ucs.actions)
+    lines = []
+    for linenum in range(random.randint(8,12)):
+    	ucs.solve(GeneratePoemProblem(firstline,words, unigramCost,bigramCost)) #todo: learn cost function and add it as second param.
+    	line = ' '.join(ucs.actions)
+    	lines.append(line)
+    	print(line)
+    return '\n'.join(lines)
 
 
 # only one argument for now. If the user specifies the -l flag
@@ -88,7 +93,7 @@ def main():
 	poemgenerator.clear_baseline_file()
 	for i in range(NUM_POEMS):
 		poem = generate_poem(firstline)
-		print("Poem number {}:".format(i))
+		print("Poem number {}:".format(i+1))
 		print(firstline + '\n' + poem)
 		poemgenerator.write_poem(poem)
 
