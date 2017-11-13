@@ -14,10 +14,6 @@ NUM_POEMS = 1
 POEMS_DIR = 'poet_parsing/poems'
 CORPUS = 'poet_parsing/corpus.txt'
 
-
-
-
-
 # reads in one poem and updates the freq defaultdict
 def read_poem(file,words,printable):
 	lines = file.readlines()

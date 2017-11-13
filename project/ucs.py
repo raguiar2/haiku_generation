@@ -32,7 +32,7 @@ class GeneratePoemProblem(util.SearchProblem):
         worditems = wordcosts.items()
         worditems.sort(key = lambda x: x[1])
         lowestcostwords = []
-        for i in range(25):
+        for i in range(10):
             lowestcostwords.append(worditems[i][0])
         for word in lowestcostwords:
             action = word
