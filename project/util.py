@@ -1,3 +1,4 @@
+
 import heapq, collections, re, sys, time, os, random
 
 ############################################################
@@ -152,4 +153,52 @@ class PoemGenerator():
         with open(self.filename,'w') as txtfile:
             txtfile.write('Poems are seven lines each, delimited by the line breaks')
             txtfile.write('\n\n')
+
+
+def evaluatePredictor(examples, predictor):
+    '''
+    predictor: a function that takes an x and returns a predicted y.
+    Given a list of examples (x, y), makes predictions based on |predict| and returns the fraction
+    of misclassiied examples.
+    '''
+    difference = 0
+    for x, y in examples:
+        guess = predictor(x) 
+        difference += abs(guess - y)
+        #print(guess,y)
+    print('avg distance from similarity is {}'.format(difference/len(examples)))
+    return difference
+
+def outputWeights(weights, path):
+    print "%d weights" % len(weights)
+    out = open(path, 'w')
+    for f, v in sorted(weights.items(), key=lambda (f, v) : -v):
+        print >>out, '\t'.join([f, str(v)])
+    out.close()
+
+def verbosePredict(phi, y, weights, out):
+    yy = 1 if dotProduct(phi, weights) > 0 else -1
+    if y:
+        print >>out, 'Truth: %s, Prediction: %s [%s]' % (y, yy, 'CORRECT' if y == yy else 'WRONG')
+    else:
+        print >>out, 'Prediction:', yy
+    for f, v in sorted(phi.items(), key=lambda (f, v) : -v * weights.get(f, 0)):
+        w = weights.get(f, 0)
+        print >>out, "%-30s%s * %s = %s" % (f, v, w, v * w)
+    return yy
+
+def outputErrorAnalysis(examples, featureExtractor, weights, path):
+    out = open('error-analysis', 'w')
+    for x, y in examples:
+        print >>out, '===', x
+        verbosePredict(featureExtractor(x), y, weights, out)
+    out.close()
+
+def interactivePrompt(featureExtractor, weights):
+    while True:
+        print '> ',
+        x = sys.stdin.readline()
+        if not x: break
+        phi = featureExtractor(x) 
+        verbosePredict(phi, None, weights, sys.stdout)
 

@@ -4,12 +4,11 @@ import gensim, logging
 import pickle
 import wordsegUtil
 import math
+import os
+import json
 from pathlib import Path
-from generate_poems import CORPUS
-
-print('training language model...')
-unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
-print('language model trained!')
+from util import *
+CORPUS = 'poet_parsing/corpus.txt'
 
 def read_lines():
     examples = []
@@ -53,8 +52,8 @@ def increment(d1, scale, d2):
 # and model difference between the two 
 def least_squares_loss(y,weights, features,model):
     margin = dotProduct(weights,features)-y
-    print('dot product is {}'.format(margin))
-    print('similarity is {}'.format(y))
+    #print('dot product is {}'.format(margin))
+    #print('similarity is {}'.format(y))
     if math.isnan(margin):
         raise ValueError
     # increment function so we have a decrease here
@@ -62,41 +61,43 @@ def least_squares_loss(y,weights, features,model):
 
 
 # Given a poem, returns a features vector about the poem 
-def featureExtractor(poem):
-    features = collections.defaultdict(int)
-    features['line_length'] = len(poem)
-    features['unigram_cost'] = unigramCost(poem[-1])
+def featureExtractor(poem,unigramCost,bigramCost):
+    features = collections.defaultdict(float)
+    features['line_length'] += len(poem)
+    if len(poem) >= 1:
+        features['unigram_cost'] += unigramCost(poem[-1])
+        features[poem[-1]] += 1
+    for word in poem:
+        features[word] += 1
+    if len(poem) >= 2:
+        features['bigram'] += bigramCost(poem[-1],poem[-2])
+    #standardization
+    for feature in features:
+        features[feature] = features[feature] / len(features)
     return features
 
-def learn_weights(trainExamples, testExamples, featureExtractor, numIters, eta,model):
-    '''
-    Given |trainExamples| and |testExamples| (each one is a list of (x,y)
-    pairs), a |featureExtractor| to apply to x, and the number of iterations to
-    train |numIters|, the step size |eta|, return the weight vector (sparse
-    feature vector) learned.
-
-    You should implement stochastic gradient descent.
-
-    Note: only use the trainExamples for training!
-    You should call evaluatePredictor() on both trainExamples and testExamples
-    to see how you're doing as you learn after each iteration.
-    '''
+def learn_weights(trainExamples, testExamples, featureExtractor, numIters, eta,model,unigramCost,bigramCost):
     #initalize as 0's
     weights = collections.defaultdict(int)  # feature => weight
     for i in range(numIters):
-        print('iteration {} completed'.format(i))
         for poem, answer in trainExamples:
-            features = featureExtractor(poem)
+            features = featureExtractor(poem,unigramCost,bigramCost)
             lossvec = least_squares_loss(answer, weights, features,model)
+            #print(lossvec)
             increment(weights,-1*eta,lossvec)
         #print training, test error
         # trainerror = evaluatePredictor(trainExamples,lambda x: 1 if dotProduct(weights,featureExtractor(x)) > 0 else -1)
-        # testerror = evaluatePredictor(testExamples,lambda x: 1 if dotProduct(weights,featureExtractor(x)) > 0 else -1)
-        # print('Training Error = {}, Test Error = {}'.format(trainerror,testerror))
+        testerror = evaluatePredictor(testExamples,lambda x: dotProduct(weights,featureExtractor(x)))
+        print('iteration {} completed'.format(i))
+        print('Sum of differences in test data = {}'.format(testerror))
+
     return weights
 
-
+# learns weights for a predicted similarity function. Used to get similar words 
 def main():
+    print('training language model...')
+    unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
+    print('language model trained!')
     print('reading in lines...')
     lines = read_lines()
     print('read in lines!')
@@ -118,8 +119,15 @@ def main():
     testlines = lines[4*len(lines)/5:]
     test_ex = parse_examples(testlines,model)
     print('test examples generated!')
-    weights = learn_weights(train_ex,test_ex,featureExtractor,1000,.005,model)
-    print(weights)
+    weights = learn_weights(train_ex,test_ex,featureExtractor,1,.007,model,unigramCost,bigramCost)
+    #write weights to file. 
+    filename = 'weights.txt'
+    with open(filename,'w') as f:
+        f.write(json.dumps(weights))
+        
+
+
+
 
 if __name__ == '__main__':
     main()
