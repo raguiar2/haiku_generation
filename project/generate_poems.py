@@ -5,14 +5,45 @@ import sys
 import random
 import string
 import util
-from util import PoemGenerator
-from ucs import GeneratePoemProblem
 import os 
+import json
 import wordsegUtil
+import collections
+import gensim, logging
+from learn_similarity_weights import featureExtractor
+from pathlib import Path
+from ucs import GeneratePoemProblem
+
+
 
 NUM_POEMS = 1
 POEMS_DIR = 'poet_parsing/poems'
 CORPUS = 'poet_parsing/corpus.txt'
+
+# function to write similarities to similarities.txt
+# shouldn't be called too often because it takes a while to do. 
+def get_word_similarities(words):
+    model_file = Path("poetmodel")
+    if model_file.is_file():
+        print('reading in existing model for word2vec')
+        model = gensim.models.Word2Vec.load('poetmodel')
+    else:
+        print('training word2vec model...')
+        model = gensim.models.Word2Vec(lines, min_count=1)
+        print('word2vec model trained!')
+        model.save('poetmodel')
+    similaritydict = collections.defaultdict(list)
+    print('getting similarities...')
+    for word in words:
+    	for word2 in words:
+    		similaritydict[word].append((word2,model.similarity(word,word2)))
+    print('similarities learned!')
+    # sort similarities by value
+    for key,value in similaritydict.items():
+    	similaritydict[key].sort(key = lambda x: x[1])
+    with open('similarities.txt','w') as f:
+    	f.write(json.dumps(similaritydict))
+    return similaritydict
 
 # reads in one poem and updates the freq defaultdict
 def read_poem(file,words,printable):
@@ -33,14 +64,10 @@ def read_poem(file,words,printable):
 
 def read_corpus():
 	words = set()
-	for file in os.listdir(POEMS_DIR):
-		# skip hidden files
-		if file[0] == '.':
-			continue
-		filepath = POEMS_DIR+'/'+file
-		with open(filepath) as file:
-			#print('reading in file {}...'.format(filepath))
-			read_poem(file,words,string.printable)
+	with open(CORPUS) as corpus:
+		for line in corpus.readlines():
+			for word in line.split():
+				words.add(word)
 	return words
 
 
@@ -56,11 +83,14 @@ def generate_poem(firstline):
     unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
     print('cost functions trained!')
     lines = []
+    # similaritydict = get_word_similarities(words)
+    similaritydict = json.load(open('similarities.txt'))
+    weights = json.load(open('weights.txt'))
     for linenum in range(random.randint(8,12)):
-    	ucs.solve(GeneratePoemProblem(firstline,words, unigramCost,bigramCost)) #todo: learn cost function and add it as second param.
+    	ucs.solve(GeneratePoemProblem(firstline,words,weights,
+    	featureExtractor,similaritydict,unigramCost,bigramCost))
     	line = ' '.join(ucs.actions)
     	lines.append(line)
-    	print(line)
     return '\n'.join(lines)
 
 
@@ -84,8 +114,10 @@ def get_args():
 
 
 def main():
+	# words = read_corpus()
+	# similaritydict = get_word_similarities(words)
 	firstline = get_args()
-	poemgenerator = PoemGenerator("poems.txt")
+	poemgenerator = util.PoemGenerator("poems.txt")
 	poemgenerator.clear_baseline_file()
 	for i in range(NUM_POEMS):
 		poem = generate_poem(firstline)
