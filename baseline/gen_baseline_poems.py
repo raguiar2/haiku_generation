@@ -1,15 +1,14 @@
 
 # This file generates the baseline poems using a greedy approach and bigram costs. 
 
-import os
-import random
-import collections
-import string
 import wordsegUtil
+import pronouncing
 from read_baseline_poems import * 
-CORPUS = 'poet_parsing/poems/all_other_poems.txt'
+CORPUS = 'poet_parsing/corpus.txt'
 NUM_POEMS = 3
-
+SYLLABLES = 5
+LONG_LINE_INCREASE = 2
+SHORT_LINES = set([0,2])
 
 
 
@@ -23,7 +22,7 @@ def write_poem(poem, filename="baseline.txt"):
 # clears the entire baseline file so new poems can be written
 def clear_baseline_file(baseline_file = "baseline.txt"):
 	with open(baseline_file,'w') as txtfile:
-		txtfile.write('Poems are seven lines each, delimited by the line breaks')
+		txtfile.write('Poems are three lines each, delimited by the line breaks')
 		txtfile.write('\n\n')
 
 
@@ -43,6 +42,29 @@ def get_min_word(bigramCost,words,prev):
 	words.remove(minword)
 	return minword
 
+# citation: https://www.sitepoint.com/community/t/printing-the-number-of-syllables-in-a-word/206809
+def get_syllables_in_word(word):
+	syllables = 0
+	for i in range(len(word)) :
+	   # If the first letter in the word is a vowel then it is a syllable.
+	   if i == 0 and word[i] in "aeiouy" :
+	      syllables = syllables + 1
+	   # Else if the previous letter is not a vowel.
+	   elif word[i - 1] not in "aeiouy" :
+	      # If it is no the last letter in the word and it is a vowel.
+	      if i < len(word) - 1 and word[i] in "aeiouy" :
+	         syllables = syllables + 1
+	      # Else if it is the last letter and it is a vowel that is not e.
+	      elif i == len(word) - 1 and word[i] in "aiouy" :
+	         syllables = syllables + 1
+	# Adjust syllables from 0 to 1.
+	if len(word) > 0 and syllables == 0 :
+	   syllables == 0
+	   syllables = 1
+
+	return syllables
+
+
 # Generates a (tanka) poem by going through the lines and 
 # putting words in greedily from the words list
 def generate_poem(bigramCost,words):
@@ -51,17 +73,25 @@ def generate_poem(bigramCost,words):
 	for linenum in range(LINE_COUNT):
 		line = []
 		# long vs short line
-		linewords = SHORT_LINE_WORDS
+		total_syllables = SYLLABLES
 		if linenum not in SHORT_LINES:
-			linewords += LONG_LINE_INCREASE
-		for wordidx in range(linewords):
+			total_syllables += LONG_LINE_INCREASE
+		while total_syllables > 0: 
 			# generate the poem here. 
+			newords = [word for word in words if get_syllables_in_word(word) <= total_syllables]
 			if prevword == wordsegUtil.SENTENCE_BEGIN:
 				word = random.choice(list(words))
 			else:
-				word = get_min_word(bigramCost,words,prevword)
+				word = get_min_word(bigramCost,newords,prevword)
 			line.append(word)
+			# keep syllable count
+			# phones = pronouncing.phones_for_word(word)
+			# print(phones)
+			# syllcount = pronouncing.syllable_count(phones)
+			# print(syllcount)
+			total_syllables -= get_syllables_in_word(word)
 			prevword = word
+			words.remove(prevword)
 		poem.append(' '.join(line))
 	return '\n'.join(poem)
 
