@@ -4,26 +4,39 @@ import os
 import random
 import collections
 import string
-POEMS_DIR = 'dickinson_parsing/poems'
+from generate_poems import get_syllables_in_word
+CORPUS = 'poet_parsing/corpus.txt'
+
+
 
 def write_first_line(file,printable):
 	lines = file.readlines()
-	firstline = lines[0]
-	with open("first_lines.txt",'a') as first_lines:
-		first_lines.write(firstline)
+	for i, line in enumerate(lines):
+		#split by spaces after edit
+		poem = line.split('\t')
+		#makes sure poorly formatted ones are filtered out
+		if len(poem) == 3:
+			firstline = poem[0]
+			syllable_count = sum([get_syllables_in_word(word) for word in firstline.split()])
+			if 'birding' in firstline:
+				print(syllable_count,[get_syllables_in_word(word) for word in firstline.split()])
+			if syllable_count == 5:
+				with open("first_lines.txt",'a') as first_lines:
+					first_lines.write(firstline+'\n')
 
 def write_to_firstlines(printable):
-	for file in os.listdir(POEMS_DIR):
-	# skip hidden files
-		if file[0] == '.':
-			continue
-		filepath = POEMS_DIR+'/'+file
-		with open(filepath) as file:
-			write_first_line(file,printable)
+	# for file in os.listdir(POEMS_DIR):
+	# # skip hidden files
+	# 	if file[0] == '.':
+	# 		continue
+	# 	filepath = POEMS_DIR+'/'+file
+	# 	with open(filepath) as file:
+	with open(CORPUS) as f:
+		write_first_line(f,printable)
 
-def main(clear_file = False):
-	if clear_file:
-		open('first_lines.txt', 'w').close()
+def main(clear_file = True):
+	with  open('first_lines.txt', 'w') as f:
+		f.write('')
 	printable = set(string.printable)
 	write_to_firstlines(printable)
 

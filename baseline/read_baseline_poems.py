@@ -5,30 +5,25 @@ import os
 import random
 import collections
 import string
-POEMS_DIR = 'poet_parsing/poems'
-LINE_COUNT = 7
-SHORT_LINE_WORDS = 4
-LONG_LINE_INCREASE = 2
+CORPUS = 'poet_parsing/corpus.txt'
 # zero indexed short lines. 
-SHORT_LINES = set([0,2])
 
 # reads in one poem and updates the freq defaultdict
 def read_poem(file,words,printable, write_to_all):
 	lines = file.readlines()
-	if write_to_all:
-		with open('all_poems.txt','a') as txtfile:
-			for line in lines:
-				txtfile.write(line)
-	for line in lines:
-		for word in line.split():
-			# TODO: This could handle quotes/hyphens better
-			# word.translate strips punctuation
-			word = word.strip()
-			word = word.translate(None, string.punctuation)
-			# strips unicode characters out. This was causing some weird
-			# spacing in the generated poems. 
-			word = ''.join(list(filter(lambda x: x in printable, word)))
-			words.append(word)
+	# if write_to_all:
+	# 	with open('all_poems.txt','a') as txtfile:
+	# 		for line in lines:
+	# 			txtfile.write(line)
+	for poem in lines:
+		for line in poem.split('\t'):
+			for word in line.split():
+			# word = word.strip()
+			# word = word.translate(None, string.punctuation)
+			# # strips unicode characters out. This was causing some weird
+			# # spacing in the generated poems. 
+			# word = ''.join(list(filter(lambda x: x in printable, word)))
+				words.append(word)
 
 
 # Reads in all the poems and stores all of the words in the 
@@ -40,13 +35,8 @@ def read_poems(printable, write_to_all = False):
 			txtfile.write('All of Emily Dickinsons poems. Used as a corpus')
 			txtfile.write('\n\n')
 	words = []
-	for file in os.listdir(POEMS_DIR):
-		# skip hidden files
-		if file[0] == '.':
-			continue
-		filepath = POEMS_DIR+'/'+file
-		with open(filepath) as file:
-			read_poem(file,words,printable, write_to_all)
+	with open(CORPUS) as file:
+		read_poem(file,words,printable, write_to_all)
 	return words
 
 # Driver code. Opens directory, and makes 
