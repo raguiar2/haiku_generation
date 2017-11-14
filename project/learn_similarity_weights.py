@@ -87,7 +87,7 @@ def learn_weights(trainExamples, testExamples, featureExtractor, numIters, eta,m
             increment(weights,-1*eta,lossvec)
         #print training, test error
         # trainerror = evaluatePredictor(trainExamples,lambda x: 1 if dotProduct(weights,featureExtractor(x)) > 0 else -1)
-        testerror = evaluatePredictor(testExamples,lambda x: dotProduct(weights,featureExtractor(x)))
+        testerror = evaluatePredictor(testExamples,lambda x: dotProduct(weights,featureExtractor(x,unigramCost,bigramCost)))
         print('iteration {} completed'.format(i))
         print('Sum of differences in test data = {}'.format(testerror))
 
@@ -119,7 +119,7 @@ def main():
     testlines = lines[4*len(lines)/5:]
     test_ex = parse_examples(testlines,model)
     print('test examples generated!')
-    weights = learn_weights(train_ex,test_ex,featureExtractor,1,.007,model,unigramCost,bigramCost)
+    weights = learn_weights(train_ex,test_ex,featureExtractor,30,.007,model,unigramCost,bigramCost)
     #write weights to file. 
     filename = 'weights.txt'
     with open(filename,'w') as f:

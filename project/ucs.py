@@ -1,6 +1,8 @@
 import util
 import wordsegUtil
 import random
+import gensim, logging
+from pathlib import Path
 from learn_similarity_weights import dotProduct
 from heapq import nsmallest
 
@@ -16,6 +18,16 @@ class GeneratePoemProblem(util.SearchProblem):
         self.similarities = similarities
         self.unigramCost = unigramCost
         self.bigramCost = bigramCost
+        model_file = Path("poetmodel")
+        if model_file.is_file():
+            #print('reading in existing model for word2vec')
+            model = gensim.models.Word2Vec.load('poetmodel')
+        else:
+            #print('training word2vec model...')
+            model = gensim.models.Word2Vec(lines, min_count=1)
+            #print('word2vec model trained!')
+            model.save('poetmodel')
+        self.model = model
     def startState(self):
     	return (self.prevword, "",self.linewords)
     def isEnd(self, state):
@@ -40,25 +52,30 @@ class GeneratePoemProblem(util.SearchProblem):
         return best_ind
 
     def _get_k_most_similar(self,words,best_guess,k):
+        #print(words)
         most_similar = []
-        closest = self._binary_search(words,best_guess)
-        lptr = closest-1
-        rptr = closest
+        # closest = self._binary_search(words,best_guess)
+        # lptr = closest-1
+        # rptr = closest
+        # print(words[closest])
         # finds k closest elements
         for _ in range(k):
-            if lptr < 0:
-                most_similar.append(words[rptr])
-                rptr += 1
-            elif rptr >= len(words):
-                most_similar.append(words[lptr])
-                lptr -= 1
-            else:
-                if words[lptr][1] < words[rptr][1]:
-                    most_similar.append(words[lptr])
-                    lptr -= 1
-                else:
-                    most_similar.append(words[rptr])
-                    rptr += 1
+            closest = (min(words, key=lambda x:abs(x[1]-best_guess)))
+            most_similar.append(closest)
+            words.remove(closest)
+            # if lptr < 0:
+            #     most_similar.append(words[rptr])
+            #     rptr += 1
+            # elif rptr >= len(words):
+            #     most_similar.append(words[lptr])
+            #     lptr -= 1
+            # else:
+            #     if words[lptr][1] < words[rptr][1]:
+            #         most_similar.append(words[lptr])
+            #         lptr -= 1
+            #     else:
+            #         most_similar.append(words[rptr])
+            #         rptr += 1
         return most_similar
     def succAndCost(self, state):
     	prevword, currline, linewords = state
@@ -70,7 +87,10 @@ class GeneratePoemProblem(util.SearchProblem):
             endlineaction = ("\n",(prevword,"",linewords+1),0) #todo: change cost 
             successors.append(endlineaction)
             return successors
-        #todo - this should be prevword
+        if prevword not in self.similarities:
+            for word in self.words:
+                self.similarities[prevword].append((word,self.model.similarity(prevword,word)))
+            self.similarities[prevword].sort()
         most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,5)
         wordcosts = {}
         for pair in most_similar:
@@ -80,7 +100,7 @@ class GeneratePoemProblem(util.SearchProblem):
         for pair in most_similar:
             word = pair[0]
             action = word
-            newstate = (prevword,tuple(currline+[word]),linewords+1)
+            newstate = (word,tuple(currline+[word]),linewords+1)
             cost = wordcosts[word]
             successors.append((action,newstate,cost))
         return successors
