@@ -34,9 +34,12 @@ def get_word_similarities(words):
         model.save('poetmodel')
     similaritydict = collections.defaultdict(list)
     print('getting similarities...')
+    index = 0
     for word in words:
     	for word2 in words:
     		similaritydict[word].append((word2,model.similarity(word,word2)))
+    	print('iteration {} complete'.format(index))
+    	index += 1
     print('similarities learned!')
     # sort similarities by value
     for key,value in similaritydict.items():
@@ -83,14 +86,15 @@ def generate_poem(firstline):
     unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
     print('cost functions trained!')
     lines = []
-    # similaritydict = get_word_similarities(words)
-    similaritydict = json.load(open('similarities.txt'))
+    similaritydict = collections.defaultdict(list)
+    #similaritydict = json.load(open('similarities.txt'))
     weights = json.load(open('weights.txt'))
-    for linenum in range(random.randint(8,12)):
+    for linenum in range(random.randint(3,4)):
     	ucs.solve(GeneratePoemProblem(firstline,words,weights,
     	featureExtractor,similaritydict,unigramCost,bigramCost))
     	line = ' '.join(ucs.actions)
     	lines.append(line)
+    	firstline = ucs.actions
     return '\n'.join(lines)
 
 
