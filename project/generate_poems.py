@@ -12,6 +12,7 @@ import collections
 import gensim, logging
 from learn_similarity_weights import featureExtractor
 from pathlib import Path
+from util import get_syllables_in_word
 from ucs import GeneratePoemProblem
 
 
@@ -19,32 +20,6 @@ from ucs import GeneratePoemProblem
 NUM_POEMS = 5
 POEMS_DIR = 'poet_parsing/poems'
 CORPUS = 'poet_parsing/corpus.txt'
-
-
-# citation: https://www.sitepoint.com/community/t/printing-the-number-of-syllables-in-a-word/206809
-def get_syllables_in_word(word):
-    syllables = 0
-    if all([ch in string.punctuation or ch == ' ' for ch in word ]):
-        return 0
-    for i in range(len(word)) :
-       if word[i] in string.punctuation:
-          continue
-       # If the first letter in the word is a vowel then it is a syllable.
-       if i == 0 and word[i] in "aeiouy" :
-          syllables = syllables + 1
-       # Else if the previous letter is not a vowel.
-       elif word[i - 1] not in "aeiouy" :
-          # If it is no the last letter in the word and it is a vowel.
-          if i < len(word) - 1 and word[i] in "aeiouy" :
-             syllables = syllables + 1
-          # Else if it is the last letter and it is a vowel that is not e.
-          elif i == len(word) - 1 and word[i] in "aiouy" :
-             syllables = syllables + 1
-    # Adjust syllables from 0 to 1.
-    if len(word) > 0 and syllables == 0:
-       syllables == 0
-       syllables = 1
-    return syllables
     
 
 # function to write similarities to similarities.txt
@@ -101,8 +76,6 @@ def read_corpus():
 	return words
 
 
-
-
 def generate_poem(firstline):
     if len(firstline) == 0:
         return ''
@@ -116,9 +89,10 @@ def generate_poem(firstline):
     similaritydict = collections.defaultdict(list)
     #similaritydict = json.load(open('similarities.txt'))
     weights = json.load(open('weights.txt'))
-    for linenum in range(random.randint(3,4)):
+    for linenum in range(2):
+        max_syllables = 5 if linenum%2==1 else 7
     	ucs.solve(GeneratePoemProblem(firstline,words,weights,
-    	featureExtractor,similaritydict,unigramCost,bigramCost))
+    	featureExtractor,similaritydict,unigramCost,bigramCost,max_syllables))
     	line = ' '.join(ucs.actions)
     	lines.append(line)
     	firstline = ucs.actions
@@ -153,8 +127,8 @@ def main():
 		firstline = get_args()
 		poem = generate_poem(firstline)
 		print("Poem number {}:".format(i+1))
-		print(firstline + '\n' + poem)
-		poemgenerator.write_poem(poem)
+		print(firstline + poem)
+		poemgenerator.write_poem(firstline + poem)
 
 if __name__=='__main__':
 	main()
