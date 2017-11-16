@@ -128,7 +128,7 @@ def main():
     testlines = lines[4*len(lines)/5:]
     test_ex = parse_examples(testlines,model)
     print('test examples generated!')
-    weights = learn_weights(train_ex,test_ex,featureExtractor,1000,.001,model,unigramCost,bigramCost)
+    weights = learn_weights(train_ex,test_ex,featureExtractor,100,.001,model,unigramCost,bigramCost)
     #write weights to file. 
     filename = 'weights.txt'
     with open(filename,'w') as f:
