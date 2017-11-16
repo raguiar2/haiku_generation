@@ -4,6 +4,10 @@
 import wordsegUtil
 import pronouncing
 from read_baseline_poems import * 
+import curses 
+from curses.ascii import isdigit 
+import nltk
+from nltk.corpus import cmudict 
 CORPUS = 'poet_parsing/corpus.txt'
 NUM_POEMS = 3
 SYLLABLES = 5
@@ -44,33 +48,16 @@ def get_min_word(bigramCost,words,prev):
 
 # citation: https://www.sitepoint.com/community/t/printing-the-number-of-syllables-in-a-word/206809
 def get_syllables_in_word(word):
-	syllables = 0
-	for i in range(len(word)) :
-	   # If the first letter in the word is a vowel then it is a syllable.
-	   if i == 0 and word[i] in "aeiouy" :
-	      syllables = syllables + 1
-	   # Else if the previous letter is not a vowel.
-	   elif word[i - 1] not in "aeiouy" :
-	      # If it is no the last letter in the word and it is a vowel.
-	      if i < len(word) - 1 and word[i] in "aeiouy" :
-	         syllables = syllables + 1
-	      # Else if it is the last letter and it is a vowel that is not e.
-	      elif i == len(word) - 1 and word[i] in "aiouy" :
-	         syllables = syllables + 1
-	# Adjust syllables from 0 to 1.
-	if len(word) > 0 and syllables == 0 :
-	   syllables == 0
-	   syllables = 1
-
-	return syllables
+	return [len(list(y for y in x if isdigit(y[-1]))) for x in d[word.lower()]]
 
 
-# Generates a (tanka) poem by going through the lines and 
+
+# Generates a (haiku) poem by going through the lines and 
 # putting words in greedily from the words list
-def generate_poem(bigramCost,words):
-	poem = []
-	prevword = wordsegUtil.SENTENCE_BEGIN
-	for linenum in range(LINE_COUNT):
+def generate_poem(bigramCost,words,firstline):
+	poem = [firstline]
+	prevword = firstline.split()[-1]
+	for linenum in range(2):
 		line = []
 		# long vs short line
 		total_syllables = SYLLABLES
@@ -95,6 +82,10 @@ def generate_poem(bigramCost,words):
 		poem.append(' '.join(line))
 	return '\n'.join(poem)
 
+def read_random_first_line(firstlines):
+	with open(firstlines) as f:
+		lines = f.readlines()
+	return random.choice(lines)
 # driver code to generate, print and write poem. 
 def generate_poems():
 	clear_baseline_file()
@@ -102,9 +93,10 @@ def generate_poems():
 	_ , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
 	words = set(read_poems(set(string.printable)))
 	for poemidx in range(NUM_POEMS):
+		firstline = read_random_first_line('first_lines.txt')
 		print('\n')
 		print('Poem {}:'.format(poemidx+1))
-		poem = generate_poem(bigramCost,words)
+		poem = generate_poem(bigramCost,words,firstline)
 		write_poem(poem)
 		print(poem)
 		print('\n')
