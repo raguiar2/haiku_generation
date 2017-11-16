@@ -54,7 +54,11 @@ class GeneratePoemProblem(util.SearchProblem):
             for word in self.words:
                 self.similarities[prevword].append((word,self.model.similarity(prevword,word)))
             #self.similarities[prevword].sort()
+<<<<<<< HEAD
         most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,len(self.similarities[prevword]),self.max_syllables-syllables)
+=======
+        most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,10,self.max_syllables-syllables)
+>>>>>>> 3b0528c3f3f2c53c1ae5ae63f8905a4460417604
         wordcosts = {}
         for pair in most_similar:
             word, similarity = pair
