@@ -76,15 +76,12 @@ def read_corpus():
 	return words
 
 
-def generate_poem(firstline):
+def generate_poem(firstline,unigramCost,bigramCost):
     if len(firstline) == 0:
         return ''
     firstline = firstline.split()
     ucs = util.UniformCostSearch(verbose=0)
     words = read_corpus()
-    print('training cost functions....')
-    unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
-    print('cost functions trained!')
     lines = []
     similaritydict = collections.defaultdict(list)
     #similaritydict = json.load(open('similarities.txt'))
@@ -123,9 +120,12 @@ def main():
 	# similaritydict = get_word_similarities(words)
 	poemgenerator = util.PoemGenerator("poems.txt")
 	poemgenerator.clear_baseline_file()
+	print('training cost functions....')
+	unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
+	print('cost functions trained!')
 	for i in range(NUM_POEMS):
 		firstline = get_args()
-		poem = generate_poem(firstline)
+		poem = generate_poem(firstline,unigramCost,bigramCost)
 		print("Poem number {}:".format(i+1))
 		print(firstline + poem)
 		poemgenerator.write_poem(firstline + poem)
