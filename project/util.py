@@ -167,7 +167,7 @@ def evaluatePredictor(examples, predictor):
         difference += abs(guess - y)
         #print(guess,y)
     print('avg distance from similarity is {}'.format(difference/len(examples)))
-    return difference
+    return difference 
 
 def outputWeights(weights, path):
     print "%d weights" % len(weights)
