@@ -17,12 +17,8 @@ def read_poem(file,words,printable, write_to_all):
 	# 			txtfile.write(line)
 	for poem in lines:
 		for line in poem.split('\t'):
+			print(line)
 			for word in line.split():
-			# word = word.strip()
-			# word = word.translate(None, string.punctuation)
-			# # strips unicode characters out. This was causing some weird
-			# # spacing in the generated poems. 
-			# word = ''.join(list(filter(lambda x: x in printable, word)))
 				words.append(word)
 
 

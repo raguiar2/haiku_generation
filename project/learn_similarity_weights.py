@@ -1,4 +1,4 @@
-# stochastic gradient descent
+# stochastic gradient descent file
 import collections
 import gensim, logging
 import pickle
@@ -6,6 +6,8 @@ import wordsegUtil
 import math
 import os
 import json
+# for plotting loss. 
+import matplotlib.pyplot as plt
 from pathlib import Path
 from util import *
 CORPUS = 'poet_parsing/corpus.txt'
@@ -22,7 +24,6 @@ def parse_examples(lines,model):
     for line in lines:
         if len(line) < 2:
             continue
-        #todo: add score of ans here as word2vec? 
         similarity = model.similarity(line[-1],line[-2])
         examples.append((line[:-1],similarity))
     return examples
@@ -79,6 +80,7 @@ def featureExtractor(poem,unigramCost,bigramCost):
 def learn_weights(trainExamples, testExamples, featureExtractor, numIters, eta,model,unigramCost,bigramCost):
     #initalize as 0's
     weights = collections.defaultdict(int)  # feature => weight
+    avgdiffs = []
     for i in range(numIters):
         for poem, answer in trainExamples:
             features = featureExtractor(poem,unigramCost,bigramCost)
@@ -87,10 +89,17 @@ def learn_weights(trainExamples, testExamples, featureExtractor, numIters, eta,m
             increment(weights,-1*eta,lossvec)
         #print training, test error
         # trainerror = evaluatePredictor(trainExamples,lambda x: 1 if dotProduct(weights,featureExtractor(x)) > 0 else -1)
+        trainerror = evaluatePredictor(trainExamples,lambda x: dotProduct(weights,featureExtractor(x,unigramCost,bigramCost)))
         testerror = evaluatePredictor(testExamples,lambda x: dotProduct(weights,featureExtractor(x,unigramCost,bigramCost)))
         print('iteration {} completed'.format(i))
         print('Sum of differences in test data = {}'.format(testerror))
-
+        print('Sum of differences in training data = {}'.format(trainerror))
+        avgdiffs.append(testerror/float(len(testExamples)))
+    plt.plot(avgdiffs)
+    plt.ylabel("avg difference in similarity")
+    plt.xlabel("iteration")
+    plt.show()
+    plt.draw()
     return weights
 
 # learns weights for a predicted similarity function. Used to get similar words 

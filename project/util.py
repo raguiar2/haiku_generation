@@ -1,5 +1,9 @@
 
 import heapq, collections, re, sys, time, os, random, string
+import curses 
+from curses.ascii import isdigit 
+import nltk
+from nltk.corpus import cmudict 
 
 ############################################################
 # Abstract interfaces for search problems and search algorithms.
@@ -167,7 +171,7 @@ def evaluatePredictor(examples, predictor):
         difference += abs(guess - y)
         #print(guess,y)
     print('avg distance from similarity is {}'.format(difference/len(examples)))
-    return difference
+    return difference, 
 
 def outputWeights(weights, path):
     print "%d weights" % len(weights)
@@ -201,28 +205,7 @@ def interactivePrompt(featureExtractor, weights):
         if not x: break
         phi = featureExtractor(x) 
         verbosePredict(phi, None, weights, sys.stdout)
-# citation: https://www.sitepoint.com/community/t/printing-the-number-of-syllables-in-a-word/206809
+# citation: https://stackoverflow.com/questions/5087493/to-find-the-number-of-syllables-in-a-word
 def get_syllables_in_word(word):
-    syllables = 0
-    if all([ch in string.punctuation or ch == ' ' for ch in word ]):
-        return 0
-    for i in range(len(word)) :
-       if word[i] in string.punctuation:
-          continue
-       # If the first letter in the word is a vowel then it is a syllable.
-       if i == 0 and word[i] in "aeiouy" :
-          syllables = syllables + 1
-       # Else if the previous letter is not a vowel.
-       elif word[i - 1] not in "aeiouy" :
-          # If it is no the last letter in the word and it is a vowel.
-          if i < len(word) - 1 and word[i] in "aeiouy" :
-             syllables = syllables + 1
-          # Else if it is the last letter and it is a vowel that is not e.
-          elif i == len(word) - 1 and word[i] in "aiouy" :
-             syllables = syllables + 1
-    # Adjust syllables from 0 to 1.
-    if len(word) > 0 and syllables == 0:
-       syllables == 0
-       syllables = 1
-    return syllables
+    return [len(list(y for y in x if isdigit(y[-1]))) for x in d[word.lower()]]
 
