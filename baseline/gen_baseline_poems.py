@@ -65,12 +65,12 @@ def get_syllables_in_word(word):
 	return syllables
 
 
-# Generates a (tanka) poem by going through the lines and 
+# Generates a (haiku) poem by going through the lines and 
 # putting words in greedily from the words list
-def generate_poem(bigramCost,words):
-	poem = []
-	prevword = wordsegUtil.SENTENCE_BEGIN
-	for linenum in range(LINE_COUNT):
+def generate_poem(bigramCost,words,firstline):
+	poem = [firstline]
+	prevword = firstline.split()[-1]
+	for linenum in range(2):
 		line = []
 		# long vs short line
 		total_syllables = SYLLABLES
@@ -95,6 +95,10 @@ def generate_poem(bigramCost,words):
 		poem.append(' '.join(line))
 	return '\n'.join(poem)
 
+def read_random_first_line(firstlines):
+	with open(firstlines) as f:
+		lines = f.readlines()
+	return random.choice(lines)
 # driver code to generate, print and write poem. 
 def generate_poems():
 	clear_baseline_file()
@@ -102,9 +106,10 @@ def generate_poems():
 	_ , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
 	words = set(read_poems(set(string.printable)))
 	for poemidx in range(NUM_POEMS):
+		firstline = read_random_first_line('first_lines.txt')
 		print('\n')
 		print('Poem {}:'.format(poemidx+1))
-		poem = generate_poem(bigramCost,words)
+		poem = generate_poem(bigramCost,words,firstline)
 		write_poem(poem)
 		print(poem)
 		print('\n')
