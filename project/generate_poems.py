@@ -124,6 +124,7 @@ def main():
 	unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
 	print('cost functions trained!')
 	for i in range(NUM_POEMS):
+		print('getting args')
 		firstline = get_args()
 		poem = generate_poem(firstline,unigramCost,bigramCost)
 		print("Poem number {}:".format(i+1))
