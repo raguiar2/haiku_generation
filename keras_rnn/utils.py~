@@ -1,0 +1,60 @@
+import numpy as np
+import string
+import math
+import operator
+import csv
+from pyphen import Pyphen
+
+
+
+def sample(prediction):
+    maxval = float('-inf')
+    maxidx = -1
+    for i, val in enumerate(prediction):
+        if val > maxval:
+            maxval = val
+            maxidx = i
+    return maxidx
+
+def get_train_data(csvname):
+    data = ''
+    firstlines = []
+    with open(csvname,'rb') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            data += row[0]
+            lines = row[0].split('\n')
+            firstlines.append(lines[0])
+    return data,firstlines
+
+def create_sequences(corpus,sequence_length,sequence_step):
+    sequences, next_chars = [], []
+    idx = 0
+    while idx + sequence_length + 1 < len(corpus):
+        sequence = corpus[idx:idx+sequence_length]
+        nextchar = corpus[idx+sequence_length]
+        sequences.append(sequence)
+        next_chars.append(nextchar)
+        idx += sequence_step
+    return sequences, next_chars
+
+def syllable_count(text, lang='en_US'):
+    """
+    Function to calculate syllable words in a text.
+    I/P - a text
+    O/P - number of syllable words
+    """
+    text = text.lower()
+    text = "".join(x for x in text if x not in exclude)
+
+    if text is None:
+        return 0
+    elif len(text) == 0:
+        return 0
+    else:
+        dic = Pyphen(lang=lang)
+        count = 0
+        for word in text.split(' '):
+            word_hyphenated = dic.inserted(word)
+            count += max(1, word_hyphenated.count("-") + 1)
+        return count
