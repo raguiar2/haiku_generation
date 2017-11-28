@@ -13,11 +13,12 @@ from keras.optimizers import RMSprop
 MODEL = 'model'
 sequence_length = 10
 sequence_step = 1
+num_epochs = 30
 
 def train_model(sequence_length,chars,X,y):
 	# Parameters and training for the model
 	model = Sequential()
-	model.add(LSTM(256, input_shape=(sequence_length, len(chars))))
+	model.add(LSTM(512, input_shape=(sequence_length, len(chars))))
 	#model.add(LSTM(128, input_shape=(sequence_length, len(chars))))
 	model.add(Dense(len(chars)))
 	model.add(Dropout(0.2))
@@ -26,7 +27,7 @@ def train_model(sequence_length,chars,X,y):
 	model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 	# fitting and saving the model
 	validatefn = ValidateData()
-	model.fit(X, y, batch_size=256, epochs=1,validation_split=.2,callbacks=[validatefn])
+	model.fit(X, y, batch_size=256, epochs=num_epochs,validation_split=.2,callbacks=[validatefn])
 	model.save(MODEL)
 
 def process_data(sequences,next_chars,chars):
