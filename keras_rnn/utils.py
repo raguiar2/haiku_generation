@@ -8,11 +8,13 @@ from keras.callbacks import Callback
 
 class ValidateData(Callback):
     def on_train_begin(self, logs={}):
-        self.losses = []
+        pass
+        #self.losses = []
 
     def on_batch_end(self, batch, logs={}):
-        self.losses.append(logs.get('loss'))
-        print('batch ended')
+        pass
+        #self.losses.append(logs.get('loss'))
+        #print('batch ended')
 
 def sample(preds, temperature=1.0):
 
