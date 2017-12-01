@@ -38,42 +38,42 @@ def get_word_similarities(words):
     print('getting similarities...')
     index = 0
     for word in words:
-    	for word2 in words:
-    		similaritydict[word].append((word2,model.similarity(word,word2)))
-    	print('iteration {} complete'.format(index))
-    	index += 1
+        for word2 in words:
+            similaritydict[word].append((word2,model.similarity(word,word2)))
+        print('iteration {} complete'.format(index))
+        index += 1
     print('similarities learned!')
     # sort similarities by value
     for key,value in similaritydict.items():
-    	similaritydict[key].sort(key = lambda x: x[1])
+        similaritydict[key].sort(key = lambda x: x[1])
     with open('similarities.txt','w') as f:
-    	f.write(json.dumps(similaritydict))
+        f.write(json.dumps(similaritydict))
     return similaritydict
 
 # reads in one poem and updates the freq defaultdict
 def read_poem(file,words,printable):
-	lines = file.readlines()
-	for line in lines:
-		for word in line.split():
-			if word in words:
-				continue
-			# TODO: This could handle quotes/hyphens better
-			# word.translate strips punctuation
-			word = word.strip()
-			word = word.translate(None, string.punctuation)
-			# strips unicode characters out. This was causing some weird
-			# spacing in the generated poems. 
-			word = ''.join(list(filter(lambda x: x in printable, word)))
-			words.add(word)
+    lines = file.readlines()
+    for line in lines:
+        for word in line.split():
+            if word in words:
+                continue
+            # TODO: This could handle quotes/hyphens better
+            # word.translate strips punctuation
+            word = word.strip()
+            word = word.translate(None, string.punctuation)
+            # strips unicode characters out. This was causing some weird
+            # spacing in the generated poems. 
+            word = ''.join(list(filter(lambda x: x in printable, word)))
+            words.add(word)
 
 
 def read_corpus():
-	words = set()
-	with open(CORPUS) as corpus:
-		for line in corpus.readlines():
-			for word in line.split():
-				words.add(word)
-	return words
+    words = set()
+    with open(CORPUS) as corpus:
+        for line in corpus.readlines():
+            for word in line.split():
+                words.add(word)
+    return words
 
 
 def generate_poem(firstline,unigramCost,bigramCost):
@@ -88,11 +88,11 @@ def generate_poem(firstline,unigramCost,bigramCost):
     weights = json.load(open('weights.txt'))
     for linenum in range(2):
         max_syllables = 5 if linenum%2==1 else 7
-    	ucs.solve(GeneratePoemProblem(firstline,words,weights,
-    	featureExtractor,similaritydict,unigramCost,bigramCost,max_syllables))
-    	line = ' '.join(ucs.actions)
-    	lines.append(line)
-    	firstline = ucs.actions
+        ucs.solve(GeneratePoemProblem(firstline,words,weights,
+        featureExtractor,similaritydict,unigramCost,bigramCost,max_syllables))
+        line = ' '.join(ucs.actions)
+        lines.append(line)
+        firstline = ucs.actions
     return '\n'.join(lines)
 
 
@@ -100,36 +100,36 @@ def generate_poem(firstline,unigramCost,bigramCost):
 # then use that as the first line. Otherwise, use a random
 # dickinson first line as the first line of the poem
 def get_args():
-	# no argument, just choose a random first line
-	# from first_lines.txt
-	if len(sys.argv) == 1:
-		with open('first_lines.txt') as lines:
-			firstlines = lines.readlines()
-			return random.choice(firstlines)
-	elif len(sys.argv) == 2:
-		firstline = sys.argv[1]
-		return firstline
-	# invalid otherwise
-	else:
-		raise Exception("Please only specify one argument")
+    # no argument, just choose a random first line
+    # from first_lines.txt
+    if len(sys.argv) == 1:
+        with open('first_lines.txt') as lines:
+            firstlines = lines.readlines()
+            return random.choice(firstlines)
+    elif len(sys.argv) == 2:
+        firstline = sys.argv[1]
+        return firstline
+    # invalid otherwise
+    else:
+        raise Exception("Please only specify one argument")
 
 
 
 def main():
-	# words = read_corpus()
-	# similaritydict = get_word_similarities(words)
-	poemgenerator = util.PoemGenerator("poems.txt")
-	poemgenerator.clear_baseline_file()
-	print('training cost functions....')
-	unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
-	print('cost functions trained!')
-	for i in range(NUM_POEMS):
-		print('getting args')
-		firstline = get_args()
-		poem = generate_poem(firstline,unigramCost,bigramCost)
-		print("Poem number {}:".format(i+1))
-		print(firstline + poem)
-		poemgenerator.write_poem(firstline + poem)
+    # words = read_corpus()
+    # similaritydict = get_word_similarities(words)
+    poemgenerator = util.PoemGenerator("poems.txt")
+    poemgenerator.clear_baseline_file()
+    print('training cost functions....')
+    unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
+    print('cost functions trained!')
+    for i in range(NUM_POEMS):
+        print('getting first line')
+        firstline = get_args()
+        poem = generate_poem(firstline,unigramCost,bigramCost)
+        print("Poem number {}:".format(i+1))
+        print(firstline + poem)
+        poemgenerator.write_poem(firstline + poem)
 
 if __name__=='__main__':
-	main()
+    main()

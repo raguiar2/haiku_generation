@@ -27,21 +27,21 @@ class GeneratePoemProblem(util.SearchProblem):
             model.save('poetmodel')
         self.model = model
     def startState(self):
-    	return (self.prevword, "",0)
+        return (self.prevword, "",0)
     def isEnd(self, state):
         prevword, currline, syllables = state
-    	return syllables == self.max_syllables
+        return syllables == self.max_syllables
     def _get_k_most_similar(self,words,best_guess,k,allowed_syllables):
         most_similar = []
         # check that we get all k words, or we run out of words. 
         while len(most_similar) < k and len(words) > 0:
             closest = (min(words, key=lambda x:abs(x[1]-best_guess)))
-            if get_syllables_in_word(closest[0]) <= allowed_syllables:
+            if get_syllables_in_word(closest[0])[0] <= allowed_syllables:
                 most_similar.append(closest)
             words.remove(closest)
         return most_similar
     def succAndCost(self, state):
-    	prevword, currline, syllables = state
+        prevword, currline, syllables = state
         currline = list(currline)
         features = self.featureExtractor(currline,self.unigramCost,self.bigramCost)
         best_guess = dotProduct(features,self.weights)
@@ -54,7 +54,7 @@ class GeneratePoemProblem(util.SearchProblem):
             for word in self.words:
                 self.similarities[prevword].append((word,self.model.similarity(prevword,word)))
             #self.similarities[prevword].sort()
-        most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,len(self.similarities[prevword]),self.max_syllables-syllables)
+        most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,10,self.max_syllables-syllables)
         #most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,10,self.max_syllables-syllables)
         wordcosts = {}
         for pair in most_similar:
@@ -64,7 +64,7 @@ class GeneratePoemProblem(util.SearchProblem):
         for pair in most_similar:
             word = pair[0]
             action = word
-            wordsyllabes = get_syllables_in_word(word)
+            wordsyllabes = get_syllables_in_word(word)[0]
             newstate = (word,tuple(currline+[word]),syllables+wordsyllabes)
             cost = wordcosts[word]
             successors.append((action,newstate,cost))
