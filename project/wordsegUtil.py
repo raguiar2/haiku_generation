@@ -5,21 +5,21 @@ import math
 SENTENCE_BEGIN = '-BEGIN-'
 
 def sliding(xs, windowSize):
-    for i in xrange(1, len(xs) + 1):
+    for i in range(1, len(xs) + 1):
         yield xs[max(0, i - windowSize):i]
 
 def removeAll(s, chars):
-    return ''.join(filter(lambda c: c not in chars, s))
+    return ''.join([c for c in s if c not in chars])
 
 def alphaOnly(s):
     s = s.replace('-', ' ')
-    return filter(lambda c: c.isalpha() or c == ' ', s)
+    return [c for c in s if c.isalpha() or c == ' ']
 
 def cleanLine(l):
     return alphaOnly(l.strip().lower())
 
 def words(l):
-    return l.split()
+    return l
 
 ############################################################
 # Make an n-gram model of words in text from a corpus.

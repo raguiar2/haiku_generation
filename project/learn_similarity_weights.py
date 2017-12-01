@@ -102,7 +102,7 @@ def learn_weights(trainExamples, testExamples, featureExtractor, numIters, eta,m
     plt.draw()
     return weights
 
-# learns weights for a predicted similarity function. Used to get similar words 
+# learns weights for a predicted similarity function. Used to get similar words.
 def main():
     print('training language model...')
     unigramCost , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
@@ -110,7 +110,8 @@ def main():
     print('reading in lines...')
     lines = read_lines()
     print('read in lines!')
-    traininglines = lines[:4*len(lines)/5]
+    print(len(lines))
+    traininglines = lines[:4*len(lines)//5]
     # 80-20 training split
     model_file = Path("poetmodel")
     if model_file.is_file():
@@ -125,7 +126,7 @@ def main():
     train_ex = parse_examples(traininglines,model)
     print('training examples generated!')
     print('generating test examples...')
-    testlines = lines[4*len(lines)/5:]
+    testlines = lines[4*len(lines)//5:]
     test_ex = parse_examples(testlines,model)
     print('test examples generated!')
     weights = learn_weights(train_ex,test_ex,featureExtractor,100,.001,model,unigramCost,bigramCost)

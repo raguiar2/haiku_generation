@@ -4,6 +4,7 @@ import curses
 from curses.ascii import isdigit 
 import nltk
 from nltk.corpus import cmudict 
+d = cmudict.dict()
 
 ############################################################
 # Abstract interfaces for search problems and search algorithms.
@@ -57,7 +58,7 @@ class UniformCostSearch(SearchAlgorithm):
             if state == None: break
             self.numStatesExplored += 1
             if self.verbose >= 2:
-                print "Exploring %s with pastCost %s" % (state, pastCost)
+                print("Exploring %s with pastCost %s" % (state, pastCost))
 
             # Check if we've reached an end state; if so, extract solution.
             if problem.isEnd(state):
@@ -69,21 +70,21 @@ class UniformCostSearch(SearchAlgorithm):
                 self.actions.reverse()
                 self.totalCost = pastCost
                 if self.verbose >= 1:
-                    print "numStatesExplored = %d" % self.numStatesExplored
-                    print "totalCost = %s" % self.totalCost
-                    print "actions = %s" % self.actions
+                    print("numStatesExplored = %d" % self.numStatesExplored)
+                    print("totalCost = %s" % self.totalCost)
+                    print("actions = %s" % self.actions)
                 return
 
             # Expand from |state| to new successor states,
             # updating the frontier with each newState.
             for action, newState, cost in problem.succAndCost(state):
                 if self.verbose >= 3:
-                    print "  Action %s => %s with cost %s + %s" % (action, newState, pastCost, cost)
+                    print("  Action %s => %s with cost %s + %s" % (action, newState, pastCost, cost))
                 if frontier.update(newState, pastCost + cost):
                     # Found better way to go to |newState|, update backpointer.
                     backpointers[newState] = (action, state)
         if self.verbose >= 1:
-            print "No path found"
+            print("No path found")
 
 # Data structure for supporting uniform cost search.
 class PriorityQueue:
@@ -170,42 +171,45 @@ def evaluatePredictor(examples, predictor):
         guess = predictor(x) 
         difference += abs(guess - y)
         #print(guess,y)
-    print('avg distance from similarity is {}'.format(difference/len(examples)))
+    print(('avg distance from similarity is {}'.format(difference/len(examples))))
     return difference 
 
 def outputWeights(weights, path):
-    print "%d weights" % len(weights)
+    print("%d weights" % len(weights))
     out = open(path, 'w')
-    for f, v in sorted(weights.items(), key=lambda (f, v) : -v):
-        print >>out, '\t'.join([f, str(v)])
+    for f, v in sorted(list(weights.items()), key=lambda f_v : -f_v[1]):
+        print('\t'.join([f, str(v)]), file=out)
     out.close()
 
 def verbosePredict(phi, y, weights, out):
     yy = 1 if dotProduct(phi, weights) > 0 else -1
     if y:
-        print >>out, 'Truth: %s, Prediction: %s [%s]' % (y, yy, 'CORRECT' if y == yy else 'WRONG')
+        print('Truth: %s, Prediction: %s [%s]' % (y, yy, 'CORRECT' if y == yy else 'WRONG'), file=out)
     else:
-        print >>out, 'Prediction:', yy
-    for f, v in sorted(phi.items(), key=lambda (f, v) : -v * weights.get(f, 0)):
+        print('Prediction:', yy, file=out)
+    for f, v in sorted(list(phi.items()), key=lambda f_v1 : -f_v1[1] * weights.get(f_v1[0], 0)):
         w = weights.get(f, 0)
-        print >>out, "%-30s%s * %s = %s" % (f, v, w, v * w)
+        print("%-30s%s * %s = %s" % (f, v, w, v * w), file=out)
     return yy
 
 def outputErrorAnalysis(examples, featureExtractor, weights, path):
     out = open('error-analysis', 'w')
     for x, y in examples:
-        print >>out, '===', x
+        print('===', x, file=out)
         verbosePredict(featureExtractor(x), y, weights, out)
     out.close()
 
 def interactivePrompt(featureExtractor, weights):
     while True:
-        print '> ',
+        print('> ', end=' ')
         x = sys.stdin.readline()
         if not x: break
         phi = featureExtractor(x) 
         verbosePredict(phi, None, weights, sys.stdout)
 # citation: https://stackoverflow.com/questions/5087493/to-find-the-number-of-syllables-in-a-word
 def get_syllables_in_word(word):
+    #error case, do not include
+    if word not in d:
+        return [float('inf')]
     return [len(list(y for y in x if isdigit(y[-1]))) for x in d[word.lower()]]
 
