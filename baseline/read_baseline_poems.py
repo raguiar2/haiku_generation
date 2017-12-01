@@ -17,7 +17,6 @@ def read_poem(file,words,printable, write_to_all):
 	# 			txtfile.write(line)
 	for poem in lines:
 		for line in poem.split('\t'):
-			print(line)
 			for word in line.split():
 				words.append(word)
 
