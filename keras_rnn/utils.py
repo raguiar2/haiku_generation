@@ -31,7 +31,7 @@ def sample(preds, temperature=1.0):
 def get_train_data(csvname):
     data = ''
     firstlines = []
-    with open(csvname,'rb') as csvfile:
+    with open(csvname,'rt') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
             data += row[0]
