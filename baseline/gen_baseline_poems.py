@@ -2,17 +2,17 @@
 # This file generates the baseline poems using a greedy approach and bigram costs. 
 
 import wordsegUtil
-import pronouncing
 from read_baseline_poems import * 
 import curses 
 from curses.ascii import isdigit 
 import nltk
 from nltk.corpus import cmudict 
+d = cmudict.dict()
 CORPUS = 'poet_parsing/corpus.txt'
 NUM_POEMS = 3
 SYLLABLES = 5
 LONG_LINE_INCREASE = 2
-SHORT_LINES = set([0,2])
+SHORT_LINES = set([1])
 
 
 
@@ -48,7 +48,10 @@ def get_min_word(bigramCost,words,prev):
 
 # citation: https://www.sitepoint.com/community/t/printing-the-number-of-syllables-in-a-word/206809
 def get_syllables_in_word(word):
-	return [len(list(y for y in x if isdigit(y[-1]))) for x in d[word.lower()] if word.lower in d]
+    #error case, do not include
+    if word not in d:
+        return [float('inf')]
+    return [len(list(y for y in x if y[-1].isdigit())) for x in d[word.lower()]]
 
 # Generates a (haiku) poem by going through the lines and 
 # putting words in greedily from the words list
@@ -63,23 +66,18 @@ def generate_poem(bigramCost,words,firstline):
 			total_syllables += LONG_LINE_INCREASE
 		while total_syllables > 0: 
 			# generate the poem here. 
-			newords = [word for word in words if get_syllables_in_word(word) <= total_syllables]
+			newords = [word for word in words if get_syllables_in_word(word)[0] <= total_syllables]
 			if prevword == wordsegUtil.SENTENCE_BEGIN:
 				word = random.choice(list(words))
 			else:
 				word = get_min_word(bigramCost,newords,prevword)
 			line.append(word)
-			# keep syllable count
-			# phones = pronouncing.phones_for_word(word)
-			# print(phones)
-			# syllcount = pronouncing.syllable_count(phones)
-			# print(syllcount)
-			total_syllables -= get_syllables_in_word(word)
+			total_syllables -= get_syllables_in_word(word)[0]
 			prevword = word
 			words.remove(prevword)
 		poem.append(' '.join(line))
-	return '\n'.join(poem)
-
+	return poem[0]+ poem[1] + '\n' + poem[2]
+ 
 def read_random_first_line(firstlines):
 	with open(firstlines) as f:
 		lines = f.readlines()

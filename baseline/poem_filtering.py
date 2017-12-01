@@ -24,7 +24,7 @@ def read_poem(file):
             # write to txt file
             # only obtain text after contents tag
             if fixedtext == "CONTENTS.":
-                print 'CONTENTS. Found'
+                print('CONTENTS. Found')
                 contentsFound = True
             if contentsFound == True:
                 txtfile.write(fixedtext.lower() + '\n')
