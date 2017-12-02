@@ -27,6 +27,9 @@ def sample(preds, temperature=1.0):
     probas = np.random.multinomial(1, preds, 1)
     return np.argmax(probas)
 
+def invalid_char(ch,i,rowlist):
+    return ch == '.' or ch == '?' or (ch == "\'" and i+1 < len(rowlist) and rowlist[i+1]!='s' and rowlist[i+1]!='l')
+
 def get_train_data(csvname):
     data = ''
     firstlines = []
@@ -36,7 +39,7 @@ def get_train_data(csvname):
             # cleans out an odd '?' and ' issue
             rowlist = list(row[0])
             for i, ch in enumerate(rowlist):
-                if ch == '?' or ch == "\'":
+                if invalid_char(ch,i,rowlist):
                     rowlist[i] = ' '
             row[0] = ''.join(rowlist)
             data += row[0]

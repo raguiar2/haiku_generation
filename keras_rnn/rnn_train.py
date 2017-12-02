@@ -15,7 +15,7 @@ MODEL = 'model'
 # sequence_length is number of words in the sentence beforehand
 sequence_length = 1
 sequence_step = 1
-num_epochs = 10
+num_epochs = 1
 
 def train_model(sequence_length,words,X,y):
 	# Parameters and training for the model
@@ -56,7 +56,7 @@ def main():
 	print('training examples generated!')
 	print('training model...')
 	model = train_model(sequence_length,words,X,y)
-	print('model trained! use python3 rnn_generate.py to create poems')
+	print('model trained! use python3 rnn_generate.py [num_poems] to create poems')
 
 if __name__ == '__main__':
 	main()

@@ -14,7 +14,7 @@ def create_poem(firstlines,model,data,words):
 	prevline = random.sample(firstlines,1)[0]
 	print(prevline)
 	prevline = prevline.split()
-	#prevline = prevline[-sequence_length:]
+	prevline = prevline[-sequence_length:]
 	# one index for clarity
 	numlines = 1
 	currline = []
@@ -52,7 +52,7 @@ def main():
 	# list of words in the data
 	words = sorted(list(set(data.split())))
 	# make sure first line is of appropriate length
-	firstlines = [line for line in firstlines if len(line.split())==sequence_length]
+	#firstlines = [line for line in firstlines if len(line.split())==sequence_length]
 	for _ in range(num_poems):
 		create_poem(firstlines,model,data,words)
 		print('')
