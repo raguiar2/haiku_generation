@@ -18,9 +18,8 @@ class ValidateData(Callback):
 
 def sample(preds, temperature=1.0):
 
-    if temperature == 0:
+    if temperature >= 0.0:
         temperature = 1
-
     preds = np.asarray(preds).astype('float64')
     preds = np.log(preds) / temperature
     exp_preds = np.exp(preds)
@@ -34,21 +33,28 @@ def get_train_data(csvname):
     with open(csvname,'rt') as csvfile:
         reader = csv.reader(csvfile)
         for row in reader:
+            # cleans out an odd '?' and ' issue
+            rowlist = list(row[0])
+            for i, ch in enumerate(rowlist):
+                if ch == '?' or ch == "\'":
+                    rowlist[i] = ' '
+            row[0] = ''.join(rowlist)
             data += row[0]
             lines = row[0].split('\n')
             firstlines.append(lines[0])
     return data,firstlines
 
 def create_sequences(corpus,sequence_length,sequence_step):
-    sequences, next_chars = [], []
+    corpus = corpus.split()
+    sequences, next_words = [], []
     idx = 0
     while idx + sequence_length + 1 < len(corpus):
         sequence = corpus[idx:idx+sequence_length]
-        nextchar = corpus[idx+sequence_length]
+        nextword = corpus[idx+sequence_length]
         sequences.append(sequence)
-        next_chars.append(nextchar)
+        next_words.append(nextword)
         idx += sequence_step
-    return sequences, next_chars
+    return sequences, next_words
 
 def syllable_count(text, lang='en_US'):
     """
@@ -56,6 +62,7 @@ def syllable_count(text, lang='en_US'):
     I/P - a text
     O/P - number of syllable words
     """
+    exclude = list(string.punctuation)
     text = text.lower()
     text = "".join(x for x in text if x not in exclude)
 

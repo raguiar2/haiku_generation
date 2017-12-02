@@ -10,3 +10,4 @@
 #SBATCH -e oatjob.err # File to which STDERR will be written
 
 oat04.stanford.edu
+python3 ./rnn_train.py
