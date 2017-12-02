@@ -13,18 +13,18 @@ from keras.optimizers import RMSprop
 #inspiration taken from https://medium.com/@ivanliljeqvist/using-ai-to-generate-lyrics-5aba7950903
 MODEL = 'model'
 # sequence_length is number of words in the sentence beforehand
-sequence_length = 3
+sequence_length = 1
 sequence_step = 1
-num_epochs = 1
+num_epochs = 10
 
 def train_model(sequence_length,words,X,y):
 	# Parameters and training for the model
 	model = Sequential()
-	model.add(LSTM(512, input_shape=(sequence_length, len(words))))
+	model.add(LSTM(256, input_shape=(sequence_length, len(words))))
 	model.add(Dense(len(words)))
-	model.add(Dropout(0.2))
+	model.add(Dropout(0.1))
 	model.add(Activation('softmax'))
-	optimizer = RMSprop(lr=0.01)
+	optimizer = RMSprop(lr=0.05)
 	model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 	# fitting and saving the model
 	validatefn = ValidateData()
