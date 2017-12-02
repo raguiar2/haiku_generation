@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import numpy as np
 import h5py
 import time
@@ -11,16 +12,16 @@ from keras.optimizers import RMSprop
 
 #inspiration taken from https://medium.com/@ivanliljeqvist/using-ai-to-generate-lyrics-5aba7950903
 MODEL = 'model'
-sequence_length = 10
+# sequence_length is number of words in the sentence beforehand
+sequence_length = 3
 sequence_step = 1
-num_epochs = 30
+num_epochs = 1
 
-def train_model(sequence_length,chars,X,y):
+def train_model(sequence_length,words,X,y):
 	# Parameters and training for the model
 	model = Sequential()
-	model.add(LSTM(512, input_shape=(sequence_length, len(chars))))
-	#model.add(LSTM(128, input_shape=(sequence_length, len(chars))))
-	model.add(Dense(len(chars)))
+	model.add(LSTM(512, input_shape=(sequence_length, len(words))))
+	model.add(Dense(len(words)))
 	model.add(Dropout(0.2))
 	model.add(Activation('softmax'))
 	optimizer = RMSprop(lr=0.01)
@@ -30,24 +31,32 @@ def train_model(sequence_length,chars,X,y):
 	model.fit(X, y, batch_size=256, epochs=num_epochs,validation_split=.2,callbacks=[validatefn])
 	model.save(MODEL)
 
-def process_data(sequences,next_chars,chars):
-	X = np.zeros((len(sequences), sequence_length, len(chars)), dtype=np.bool)
-	y = np.zeros((len(sequences), len(chars)), dtype=np.bool)
+
+#TODO: Edit this to words
+def process_data(sequences,next_words,words):
+	X = np.zeros((len(sequences), sequence_length, len(words)), dtype=np.bool)
+	y = np.zeros((len(sequences), len(words)), dtype=np.bool)
 	for i, sequence in enumerate(sequences):
-	    y[i, chars.index(next_chars[i])] = 1
-	    for t, char in enumerate(sequence):
-	        X[i, t, chars.index(char)] = 1
+	    y[i, words.index(next_words[i])] = 1
+	    for t, word in enumerate(sequence):
+	        X[i, t, words.index(word)] = 1
 	return X,y
 
 def main():
 	# getting and processing the data
-	data, firstlines = get_train_data('haikus.csv')
-	#chars is a set of the characters that appear in the data. 
-	chars = string.printable
-	sequences, next_chars = create_sequences(data, sequence_length, sequence_step)
+	print('reading in data...')
+	data, _ = get_train_data('haikus.csv')
+	print('data read in!')
+	#words is a sorted list of the words that appear in the data. 
+	words = sorted(list(set(data.split())))
+	print('generating training examples...')
+	sequences, next_words = create_sequences(data, sequence_length, sequence_step)
 	# converting data into arrays
-	X,y = process_data(sequences,next_chars,chars)
-	model = train_model(sequence_length,chars,X,y)
+	X,y = process_data(sequences,next_words,words)
+	print('training examples generated!')
+	print('training model...')
+	model = train_model(sequence_length,words,X,y)
+	print('model trained! use python3 rnn_generate.py to create poems')
 
 if __name__ == '__main__':
 	main()
