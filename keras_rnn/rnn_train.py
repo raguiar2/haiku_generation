@@ -5,7 +5,7 @@ import time
 import string
 from utils import *
 from keras.models import Sequential
-from keras.layers import Dense, LSTM, Dropout, Activation
+from keras.layers import Dense, LSTM, Dropout, Activation, Flatten
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 from keras.optimizers import RMSprop
@@ -15,20 +15,20 @@ MODEL = 'model'
 # sequence_length is number of words in the sentence beforehand
 sequence_length = 1
 sequence_step = 1
-num_epochs = 1
+num_epochs = 10
 
 def train_model(sequence_length,words,X,y):
 	# Parameters and training for the model
 	model = Sequential()
-	model.add(LSTM(256, input_shape=(sequence_length, len(words))))
+	model.add(LSTM(512, input_shape=(sequence_length, len(words))))
 	model.add(Dense(len(words)))
-	model.add(Dropout(0.1))
+	model.add(Dropout(0.7))
 	model.add(Activation('softmax'))
 	optimizer = RMSprop(lr=0.05)
 	model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 	# fitting and saving the model
 	validatefn = ValidateData()
-	model.fit(X, y, batch_size=256, epochs=num_epochs,validation_split=.2,callbacks=[validatefn])
+	model.fit(X, y, batch_size=1024, epochs=num_epochs,validation_split=.2,callbacks=[validatefn])
 	model.save(MODEL)
 
 

@@ -28,7 +28,7 @@ def sample(preds, temperature=1.0):
     return np.argmax(probas)
 
 def invalid_char(ch,i,rowlist):
-    return ch == '.' or ch == '?' or (ch == "\'" and i+1 < len(rowlist) and rowlist[i+1]!='s' and rowlist[i+1]!='l')
+    return ch == '.' or ch == '?' or (ch == "\'" and i+1 < len(rowlist) and rowlist[i+1] not in ['t','l','s'] )
 
 def get_train_data(csvname):
     data = ''

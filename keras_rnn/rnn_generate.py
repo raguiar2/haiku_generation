@@ -10,6 +10,7 @@ import numpy as np
 from rnn_train import MODEL, sequence_length
 from utils import *
 
+
 def create_poem(firstlines,model,data,words):
 	prevline = random.sample(firstlines,1)[0]
 	print(prevline)
@@ -38,7 +39,8 @@ def create_poem(firstlines,model,data,words):
 			currline = []
 		# loop to next word in sentence. 
 		prevline.append(next_word)
-		prevline = prevline[1:]
+		if len(prevline) > sequence_length:
+			prevline = prevline[1:]
 
 
 
