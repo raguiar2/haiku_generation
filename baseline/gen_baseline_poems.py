@@ -2,13 +2,14 @@
 # This file generates the baseline poems using a greedy approach and bigram costs. 
 
 import wordsegUtil
-from read_baseline_poems import * 
 import curses 
-from curses.ascii import isdigit 
 import nltk
+from read_baseline_poems import * 
+from wordsegUtil import get_train_data
+from curses.ascii import isdigit 
 from nltk.corpus import cmudict 
 d = cmudict.dict()
-CORPUS = 'poet_parsing/corpus.txt'
+CORPUS = 'poet_parsing/haikus.csv'
 NUM_POEMS = 3
 SYLLABLES = 5
 LONG_LINE_INCREASE = 2
@@ -86,7 +87,9 @@ def read_random_first_line(firstlines):
 def generate_poems():
 	clear_baseline_file()
 	# Also returns an unused unigram cost. 
-	_ , bigramCost = wordsegUtil.makeLanguageModels(CORPUS)
+	data, firstlines = get_train_data(CORPUS)
+	data = data.split()
+	_ , bigramCost = wordsegUtil.makeLanguageModels(data)
 	words = set(read_poems(set(string.printable)))
 	for poemidx in range(NUM_POEMS):
 		firstline = read_random_first_line('first_lines.txt')
