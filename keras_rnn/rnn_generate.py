@@ -53,6 +53,7 @@ def main():
 	data, firstlines = get_train_data('haikus.csv')
 	# list of words in the data
 	words = sorted(list(set(data.split())))
+	data = data[3*len(data)//4:]
 	# make sure first line is of appropriate length
 	#firstlines = [line for line in firstlines if len(line.split())==sequence_length]
 	for _ in range(num_poems):

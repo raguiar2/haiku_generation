@@ -5,6 +5,7 @@ import operator
 import csv
 from pyphen import Pyphen
 from keras.callbacks import Callback
+# import matplotlib.pyplot as plt
 
 class ValidateData(Callback):
     def on_train_begin(self, logs={}):
@@ -25,6 +26,8 @@ def sample(preds, temperature=1.0):
     exp_preds = np.exp(preds)
     preds = exp_preds / np.sum(exp_preds)
     probas = np.random.multinomial(1, preds, 1)
+    # plt.plot(preds)
+    # plt.show()
     return np.argmax(probas)
 
 def invalid_char(ch,i,rowlist):
