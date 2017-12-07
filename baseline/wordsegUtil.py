@@ -1,5 +1,6 @@
 import collections
 import math
+import csv
 
 SENTENCE_BEGIN = '-BEGIN-'
 
@@ -23,7 +24,7 @@ def words(l):
 ############################################################
 # Make an n-gram model of words in text from a corpus.
 
-def makeLanguageModels(path):
+def makeLanguageModels(data):
     unigramCounts = collections.Counter()
     totalCounts = 0
     bigramCounts = collections.Counter()
@@ -39,15 +40,14 @@ def makeLanguageModels(path):
         else:
             return tuple(win)
 
-    with open(path, 'r') as f:
-        for l in f:
-            ws = words(cleanLine(l))
-            unigrams = [x[0] for x in sliding(ws, 1)]
-            bigrams = [bigramWindow(x) for x in sliding(ws, 2)]
-            totalCounts += len(unigrams)
-            unigramCounts.update(unigrams)
-            bigramCounts.update(bigrams)
-            bitotalCounts.update([x[0] for x in bigrams])
+    for l in data:
+        ws = words(cleanLine(l))
+        unigrams = [x[0] for x in sliding(ws, 1)]
+        bigrams = [bigramWindow(x) for x in sliding(ws, 2)]
+        totalCounts += len(unigrams)
+        unigramCounts.update(unigrams)
+        bigramCounts.update(bigrams)
+        bitotalCounts.update([x[0] for x in bigrams])
 
     def unigramCost(x):
         if x not in unigramCounts:
@@ -58,8 +58,8 @@ def makeLanguageModels(path):
 
     def bigramModel(a, b):
         return math.log(bitotalCounts[a] + VOCAB_SIZE) - math.log(bigramCounts[(a, b)] + 1)
-
     return unigramCost, bigramModel
+
 
 def logSumExp(x, y):
     lo = min(x, y)
@@ -99,3 +99,24 @@ def makeInverseRemovalDictionary(path, removeChars):
         return wordsRemovedToFull.get(short, empty)
 
     return possibleFills
+
+def invalid_char(ch,i,rowlist):
+    return ch == '.' or ch == '?' or (ch == "\'" and i+1 < len(rowlist) and rowlist[i+1] not in ['t','l','s'] )
+
+
+def get_train_data(csvname):
+    data = ''
+    firstlines = []
+    with open(csvname,'rt') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            # cleans out an odd '?' and ' issue
+            rowlist = list(row[0])
+            for i, ch in enumerate(rowlist):
+                if invalid_char(ch,i,rowlist):
+                    rowlist[i] = ' '
+            row[0] = ''.join(rowlist)
+            data += row[0]
+            lines = row[0].split('\n')
+            firstlines.append(lines[0])
+    return data,firstlines

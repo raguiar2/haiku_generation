@@ -5,33 +5,30 @@ import os
 import random
 import collections
 import string
-CORPUS = 'poet_parsing/corpus.txt'
+from wordsegUtil import get_train_data
+CORPUS = 'poet_parsing/haikus.csv'
 # zero indexed short lines. 
 
 # reads in one poem and updates the freq defaultdict
-def read_poem(file,words,printable, write_to_all):
-	lines = file.readlines()
-	# if write_to_all:
-	# 	with open('all_poems.txt','a') as txtfile:
-	# 		for line in lines:
-	# 			txtfile.write(line)
-	for poem in lines:
-		for line in poem.split('\t'):
-			for word in line.split():
-				words.append(word)
+def read_poem(line,words,printable):
+	for word in line.split():
+		words.append(word)
 
 
 # Reads in all the poems and stores all of the words in the 
 # words list. Then returns the words list for use in 
 # poem generation. 
-def read_poems(printable, write_to_all = False):
-	if write_to_all:
-		with open('all_poems.txt','w') as txtfile:
-			txtfile.write('All of Emily Dickinsons poems. Used as a corpus')
-			txtfile.write('\n\n')
+def read_poems(printable):
 	words = []
-	with open(CORPUS) as file:
-		read_poem(file,words,printable, write_to_all)
+	data, firstlines = get_train_data(CORPUS)
+	with open('first_lines.txt','w') as f:
+		for i, firstline in enumerate(firstlines):
+			f.write(firstline)
+			if i != len(firstlines) - 1:
+				f.write('\n')
+	data = data.split()
+	for line in data:
+		read_poem(line,words,printable)
 	return words
 
 # Driver code. Opens directory, and makes 
