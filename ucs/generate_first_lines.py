@@ -7,7 +7,7 @@ import string
 import csv
 from generate_poems import get_syllables_in_word
 from util import *
-CORPUS = 'poet_parsing/haikus.csv'
+CORPUS = 'haikus.csv'
 
 
 def write_first_lines(firstlines):

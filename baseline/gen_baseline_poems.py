@@ -9,7 +9,7 @@ from wordsegUtil import get_train_data
 from curses.ascii import isdigit 
 from nltk.corpus import cmudict 
 d = cmudict.dict()
-CORPUS = 'poet_parsing/haikus.csv'
+CORPUS = 'haikus.csv'
 NUM_POEMS = 3
 SYLLABLES = 5
 LONG_LINE_INCREASE = 2

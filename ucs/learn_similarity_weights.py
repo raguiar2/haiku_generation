@@ -10,7 +10,7 @@ import json
 import matplotlib.pyplot as plt
 from pathlib import Path
 from util import *
-CORPUS = 'poet_parsing/haikus.csv'
+CORPUS = 'haikus.csv'
 
 def parse_examples(lines,model):
     examples = []

@@ -16,7 +16,7 @@ from util import get_syllables_in_word, get_train_data
 from ucs import GeneratePoemProblem
 
 NUM_POEMS = 5
-CORPUS = 'poet_parsing/haikus.csv'
+CORPUS = 'haikus.csv'
     
 
 # function to write similarities to similarities.txt

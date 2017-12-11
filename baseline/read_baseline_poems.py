@@ -6,7 +6,7 @@ import random
 import collections
 import string
 from wordsegUtil import get_train_data
-CORPUS = 'poet_parsing/haikus.csv'
+CORPUS = 'haikus.csv'
 # zero indexed short lines. 
 
 # reads in one poem and updates the freq defaultdict

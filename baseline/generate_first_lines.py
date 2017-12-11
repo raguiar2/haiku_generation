@@ -3,7 +3,7 @@
 import string
 import csv
 from wordsegUtil import * 
-CORPUS = 'poet_parsing/haikus.csv'
+CORPUS = 'haikus.csv'
 
 
 def write_first_lines(firstlines):
