@@ -5,20 +5,7 @@ import operator
 import csv
 from pyphen import Pyphen
 from keras.callbacks import Callback
-<<<<<<< HEAD
-=======
 # import matplotlib.pyplot as plt
->>>>>>> better_branch
-
-class ValidateData(Callback):
-    def on_train_begin(self, logs={}):
-        pass
-        #self.losses = []
-
-    def on_batch_end(self, batch, logs={}):
-        pass
-        #self.losses.append(logs.get('loss'))
-        #print('batch ended')
 
 def sample(preds, temperature=1.0):
 
@@ -29,10 +16,6 @@ def sample(preds, temperature=1.0):
     exp_preds = np.exp(preds)
     preds = exp_preds / np.sum(exp_preds)
     probas = np.random.multinomial(1, preds, 1)
-<<<<<<< HEAD
-    return np.argmax(probas)
-
-=======
     # plt.plot(preds)
     # plt.show()
     return np.argmax(probas)
@@ -40,7 +23,6 @@ def sample(preds, temperature=1.0):
 def invalid_char(ch,i,rowlist):
     return ch == '.' or ch == '?' or (ch == "\'" and i+1 < len(rowlist) and rowlist[i+1] not in ['t','l','s'] )
 
->>>>>>> better_branch
 def get_train_data(csvname):
     data = ''
     firstlines = []
@@ -50,11 +32,7 @@ def get_train_data(csvname):
             # cleans out an odd '?' and ' issue
             rowlist = list(row[0])
             for i, ch in enumerate(rowlist):
-<<<<<<< HEAD
-                if ch == '?' or ch == "\'":
-=======
                 if invalid_char(ch,i,rowlist):
->>>>>>> better_branch
                     rowlist[i] = ' '
             row[0] = ''.join(rowlist)
             data += row[0]

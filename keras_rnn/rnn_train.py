@@ -9,7 +9,8 @@ from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 from keras.optimizers import RMSprop
 
-#inspiration taken from https://medium.com/@ivanliljeqvist/using-ai-to-generate-lyrics-5aba7950903
+# inspiration taken from https://medium.com/@ivanliljeqvist/using-ai-to-generate-lyrics-5aba7950903
+# however, we did change the model presented in that article and also the parameters. 
 MODEL = 'model'
 # sequence_length is number of words in the sentence beforehand
 sequence_length = 1
@@ -19,16 +20,13 @@ num_epochs = 25
 def train_model(sequence_length,words,X,y):
 	# Parameters and training for the model
 	model = Sequential()
-	model.add(LSTM(1024, input_shape=(sequence_length, len(words))))
+	model.add(LSTM(512, input_shape=(sequence_length, len(words))))
 	model.add(Dense(len(words)))
 	model.add(Dropout(0.7))
-	model.add(Dense(len(words)))
 	model.add(Activation('softmax'))
 	optimizer = RMSprop(lr=0.05)
 	model.compile(loss='categorical_crossentropy', optimizer=optimizer)
 	# fitting and saving the model
-
-#TODO: Edit this to words
 	history = model.fit(X, y, batch_size=1024, epochs=num_epochs,validation_split=.2)
 	# saves our loss for plotting. 
 	with open('loss.pickle','wb') as l:

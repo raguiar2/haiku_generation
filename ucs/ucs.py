@@ -52,9 +52,7 @@ class GeneratePoemProblem(util.SearchProblem):
         if prevword not in self.similarities:
             for word in self.words:
                 self.similarities[prevword].append((word,self.model.similarity(prevword,word)))
-            #self.similarities[prevword].sort()
-        most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,10,self.max_syllables-syllables)
-        #most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,10,self.max_syllables-syllables)
+        most_similar = self._get_k_most_similar(self.similarities[prevword],best_guess,20,self.max_syllables-syllables)
         wordcosts = {}
         for pair in most_similar:
             word, similarity = pair

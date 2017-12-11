@@ -1,9 +1,6 @@
 import collections
 import math
-<<<<<<< HEAD
-=======
 import csv
->>>>>>> better_branch
 
 SENTENCE_BEGIN = '-BEGIN-'
 
@@ -27,11 +24,8 @@ def words(l):
 ############################################################
 # Make an n-gram model of words in text from a corpus.
 
-<<<<<<< HEAD
-def makeLanguageModels(path):
-=======
+
 def makeLanguageModels(data):
->>>>>>> better_branch
     unigramCounts = collections.Counter()
     totalCounts = 0
     bigramCounts = collections.Counter()
@@ -66,7 +60,6 @@ def makeLanguageModels(data):
     return unigramCost, bigramModel
 
 
->>>>>>> better_branch
 def logSumExp(x, y):
     lo = min(x, y)
     hi = max(x, y)
