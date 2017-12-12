@@ -11,7 +11,6 @@ class GeneratePoemProblem(util.SearchProblem):
     def __init__(self,firstline,words,weights,featureExtractor,similarities,unigramCost,bigramCost, max_syllables):
         self.prevword = firstline[-1]
         self.max_syllables = max_syllables
-        # fix this to something more complicated? 
         self.words = words
         self.featureExtractor = featureExtractor
         self.weights = weights
@@ -22,8 +21,7 @@ class GeneratePoemProblem(util.SearchProblem):
         if model_file.is_file():
             model = gensim.models.Word2Vec.load('poetmodel')
         else:
-            model = gensim.models.Word2Vec(lines, min_count=1)
-            model.save('poetmodel')
+            raise Exception("Please train the word2vec model using python3 learn_similarity_weights.py")
         self.model = model
     def startState(self):
         return (self.prevword, "",0)
@@ -45,10 +43,10 @@ class GeneratePoemProblem(util.SearchProblem):
         features = self.featureExtractor(currline,self.unigramCost,self.bigramCost)
         best_guess = dotProduct(features,self.weights)
         successors = []
-        if syllables>=self.max_syllables:
-            endlineaction = ("\n",(prevword,"",syllables),0) #todo: change cost 
-            successors.append(endlineaction)
-            return successors
+        # if syllables>=self.max_syllables:
+        #     endlineaction = ("\n",(prevword,"",syllables),0) #todo: change cost 
+        #     successors.append(endlineaction)
+            # return successors
         if prevword not in self.similarities:
             for word in self.words:
                 self.similarities[prevword].append((word,self.model.similarity(prevword,word)))

@@ -52,7 +52,11 @@ def main():
 	num_poems = 1
 	if len(sys.argv) >=2:
 		num_poems = int(sys.argv[1])
-	model = keras.models.load_model(MODEL)
+	try:
+		model = keras.models.load_model(MODEL)
+	except OSError:
+		# could not find model
+		raise Exception("Please learn the model by running python3 rnn_train.py first!")
 	data, firstlines = get_train_data('haikus.csv')
 	# list of words in the data
 	words = sorted(list(set(data.split())))

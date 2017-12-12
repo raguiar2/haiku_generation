@@ -89,11 +89,11 @@ def learn_weights(trainExamples, testExamples, featureExtractor, numIters, eta,m
         print('Sum of differences in test data = {}'.format(testerror))
         print('Sum of differences in training data = {}'.format(trainerror))
         avgdiffs.append(testerror/float(len(testExamples)))
-    plt.plot(avgdiffs)
-    plt.ylabel("avg difference in similarity")
-    plt.xlabel("iteration")
-    plt.show()
-    plt.draw()
+    # plt.plot(avgdiffs)
+    # plt.ylabel("avg difference in similarity")
+    # plt.xlabel("iteration")
+    # plt.show()
+    # plt.draw()
     return weights
 
 # learns weights for a predicted similarity function. Used to get similar words.
